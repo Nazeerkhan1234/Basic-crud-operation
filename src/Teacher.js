@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 
 function Teacher() {
   const [Teacher, setTeacher] = useState([{}]);
+  const [payload, setPayload] = useState({
+    data: {
+      name: "khan bhai",
+    },
+  });
+  const [name, changName] = useState("");
 
   //useEffect Hooks
   useEffect(() => {
@@ -10,12 +16,13 @@ function Teacher() {
         return res.json();
       })
       .then((data) => {
-        let newObj = data.data.map((cv,idx,arr)=>{
+        // console.log(data.data)
+        let newObj = data.data.map((cv, idx, arr) => {
           return {
-            Id:cv.id,
-            name:cv.attributes.name,
-            createdAt:cv.attributes.createdAt
-          }
+            id: cv.id,
+            name: cv.attributes.name,
+            createdAt: cv.attributes.createdAt,
+          };
         });
         // console.log(newObj)
         setTeacher(newObj);
@@ -24,52 +31,66 @@ function Teacher() {
         console.log(err);
       });
   }, []);
+
+  let getData = () => {
+    fetch(`http://localhost:1337/api/teachers`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  let setName = (e) => {
+    // console.log(e.target.value);
+    changName(e.target.value);
+    setPayload({
+      ...payload,
+      data: {
+        name: document.querySelector("input#exampleInputEmail1").value,
+      },
+    });
+  };
   return (
     <>
       <div className="container">
         <form>
           <div className="mb-3">
-            <label htmlFor="exampleInputEmail1" className="form-label">
-              Email address
+            <label htmlFor="exampleInputName1" className="form-label">
+              Name
             </label>
             <input
-              type="email"
+              type="text"
               className="form-control"
               id="exampleInputEmail1"
               aria-describedby="emailHelp"
-            />
-            <div id="emailHelp" className="form-text">
-              We'll never share your email with anyone else.
-            </div>
-          </div>
-          <div className="mb-3">
-            <label htmlFor="exampleInputPassword1" className="form-label">
-              Password
-            </label>
-            <input
-              type="password"
-              className="form-control"
-              id="exampleInputPassword1"
+              onChange={(e) => {
+                setName(e);
+              }}
             />
           </div>
-          <div className="mb-3 form-check">
-            <input
-              type="checkbox"
-              className="form-check-input"
-              id="exampleCheck1"
-            />
-            <label className="form-check-label" htmlFor="exampleCheck1">
-              Check me out
-            </label>
-          </div>
-          <button type="submit" className="btn btn-primary">
+          <button
+            type="submit"
+            className="btn btn-primary"
+            onClick={() => {
+              getData();
+            }}
+          >
             Submit
           </button>
         </form>
-
         <br />
         <hr />
-
         <table className="table">
           <thead>
             <tr>
@@ -82,7 +103,7 @@ function Teacher() {
             {Teacher.map((cv, idx, arr) => {
               return (
                 <tr key={idx}>
-                  <td>{cv.Id}</td>
+                  <td>{cv.id}</td>
                   <td>{cv.name}</td>
                   <td>{cv.createdAt}</td>
                 </tr>
@@ -94,5 +115,4 @@ function Teacher() {
     </>
   );
 }
-
 export default Teacher;
