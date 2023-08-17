@@ -1,5 +1,5 @@
+// import swal from 'sweetalert';  
 import { useEffect, useState } from "react";
-
 function Teacher() {
   const [Teacher, setTeacher] = useState([{}]);
   const [payload, setPayload] = useState({
@@ -10,6 +10,7 @@ function Teacher() {
   const [name, changName] = useState("");
 
   //useEffect Hooks
+  //get Data
   useEffect(() => {
     fetch("http://localhost:1337/api/teachers")
       .then((res) => {
@@ -33,6 +34,7 @@ function Teacher() {
   }, []);
 
   let getData = () => {
+    //Post Data
     fetch(`http://localhost:1337/api/teachers`, {
       method: "POST",
       headers: {
@@ -53,7 +55,7 @@ function Teacher() {
 
   let setName = (e) => {
     // console.log(e.target.value);
-    changName(e.target.value);
+    // changName(e.target.value);
     setPayload({
       ...payload,
       data: {
@@ -61,6 +63,24 @@ function Teacher() {
       },
     });
   };
+
+
+  let deleteName=(e)=>{
+    let delid=(e.target.closest('tr').querySelector('td:first-child').innerHTML);
+  let ans=window.confirm("do you really want to delete ?");
+  if(ans === true){
+    fetch(`http://localhost:1337/api/teachers/${delid}`,{
+      method:"DELETE"
+    }).then((res)=>{
+      return res.json();
+    }).then((data)=>{
+      console.log(data);
+    }).catch((err)=>{
+      console.log(err);
+    });
+  }
+   
+  }
   return (
     <>
       <div className="container">
@@ -97,6 +117,7 @@ function Teacher() {
               <th scope="col">Id</th>
               <th scope="col">Name</th>
               <th scope="col">createdAt</th>
+              <th scope="col">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -106,6 +127,11 @@ function Teacher() {
                   <td>{cv.id}</td>
                   <td>{cv.name}</td>
                   <td>{cv.createdAt}</td>
+                  <td>
+                   <button className="btn btn-sm btn-success">view</button>
+                   <button className="btn btn-sm btn-primary">Edit</button>
+                   <button className="btn btn-sm btn-danger" onClick={(e)=>{deleteName(e)}}>Delete</button>
+                  </td>
                 </tr>
               );
             })}
